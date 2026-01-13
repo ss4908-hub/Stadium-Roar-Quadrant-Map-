@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stadium Roar Quadrant - Fight Song Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Oswald:wght@400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: 'Oswald', sans-serif;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      font-family: 'Russo One', sans-serif;
+      color: #1a5d1a;
+      font-size: 2.2rem;
+      text-align: center;
+      margin-bottom: 5px;
+      letter-spacing: 2px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    /* Main field container */
+    .field-container {
+      position: relative;
+      width: 900px;
+      height: 520px;
+      background: #4a9c4a;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Field grass stripes */
+    .field-stripes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        #4a9c4a 0px,
+        #4a9c4a 90px,
+        #3d8a3d 90px,
+        #3d8a3d 180px
+      );
+    }
+
+    /* White border/sidelines */
+    .field-border {
+      position: absolute;
+      top: 15px;
+      left: 50px;
+      right: 50px;
+      bottom: 15px;
+      border: 4px solid #fff;
+      border-radius: 4px;
+    }
+
+    /* End zones */
+    .end-zone {
+      position: absolute;
+      top: 15px;
+      bottom: 15px;
+      width: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: 'Russo One', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 3px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .end-zone-left {
+      left: 4px;
+      background: linear-gradient(180deg, #c41e3a 0%, #a01830 100%);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .end-zone-right {
+      right: 4px;
+      background: linear-gradient(180deg, #c41e3a 0%, #a01830 100%);
+      border-radius: 0 4px 4px 0;
+      transform: rotate(180deg);
+    }
+
+    /* Yard lines */
+    .yard-lines {
+      position: absolute;
+      top: 15px;
+      left: 50px;
+      right: 50px;
+      bottom: 15px;
+      pointer-events: none;
+    }
+
+    .yard-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,0.6);
+    }
+
+    .yard-number {
+      position: absolute;
+      top: 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.8);
+      transform: translateX(-50%);
+    }
+
+    .yard-number-bottom {
+      top: auto;
+      bottom: 8px;
+    }
+
+    /* Hash marks */
+    .hash-mark {
+      position: absolute;
+      width: 8px;
+      height: 2px;
+      background: rgba(255,255,255,0.5);
+    }
+
+    /* Plot area */
+    .plot-area {
+      position: absolute;
+      top: 45px;
+      left: 80px;
+      right: 80px;
+      bottom: 45px;
+      z-index: 10;
+    }
+
+    /* Quadrant overlays */
+    .quadrant {
+      position: absolute;
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    .quadrant-top-left {
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 50%;
+      background: linear-gradient(135deg, rgba(155, 89, 182, 0.8) 0%, rgba(142, 68, 173, 0.6) 100%);
+    }
+
+    .quadrant-top-right {
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 50%;
+      background: linear-gradient(135deg, rgba(243, 156, 18, 0.6) 0%, rgba(230, 126, 34, 0.8) 100%);
+    }
+
+    .quadrant-bottom-left {
+      bottom: 0;
+      left: 0;
+      width: 50%;
+      height: 50%;
+      background: linear-gradient(135deg, rgba(52, 152, 219, 0.6) 0%, rgba(41, 128, 185, 0.8) 100%);
+    }
+
+    .quadrant-bottom-right {
+      bottom: 0;
+      right: 0;
+      width: 50%;
+      height: 50%;
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.6) 0%, rgba(39, 174, 96, 0.8) 100%);
+    }
+
+    /* Quadrant labels */
+    .quadrant-label {
+      position: absolute;
+      font-family: 'Russo One', sans-serif;
+      font-size: 0.7rem;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      z-index: 20;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      letter-spacing: 1px;
+    }
+
+    .label-top-left {
+      top: 50px;
+      left: 85px;
+      background: rgba(155, 89, 182, 0.85);
+    }
+
+    .label-top-right {
+      top: 50px;
+      right: 85px;
+      background: rgba(243, 156, 18, 0.85);
+    }
+
+    .label-bottom-left {
+      bottom: 50px;
+      left: 85px;
+      background: rgba(52, 152, 219, 0.85);
+    }
+
+    .label-bottom-right {
+      bottom: 50px;
+      right: 85px;
+      background: rgba(46, 204, 113, 0.85);
+    }
+
+    /* Axis labels */
+    .axis-label {
+      position: absolute;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem;
+      color: #fff;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+      z-index: 25;
+    }
+
+    .x-axis-label {
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .y-axis-label {
+      left: 55px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+    }
+
+    /* Center lines - 50 yard line dividers */
+    .center-line-h {
+      position: absolute;
+      left: 80px;
+      right: 80px;
+      top: 50%;
+      height: 4px;
+      background: #fff;
+      z-index: 5;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
+
+    .center-line-v {
+      position: absolute;
+      top: 45px;
+      bottom: 45px;
+      left: 50%;
+      width: 4px;
+      background: #fff;
+      z-index: 5;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
+
+    /* Data points - football shapes */
+    .data-point {
+      position: absolute;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 30;
+    }
+
+    .data-point:hover {
+      transform: scale(1.4);
+      z-index: 100;
+    }
+
+    .data-point:hover .football-glow {
+      opacity: 1;
+    }
+
+    .football-wrapper {
+      position: relative;
+    }
+
+    .football-glow {
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: fixed;
+      background: #fff;
+      color: #333;
+      padding: 15px 18px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 1000;
+      border: 3px solid #1a5d1a;
+      min-width: 220px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .tooltip.visible {
+      opacity: 1;
+    }
+
+    .tooltip .school {
+      font-weight: 700;
+      color: #1a5d1a;
+      font-size: 1.1rem;
+      margin-bottom: 3px;
+    }
+
+    .tooltip .song-name {
+      color: #888;
+      font-size: 0.75rem;
+      font-style: italic;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .tooltip .quadrant-name {
+      color: #666;
+      font-size: 0.8rem;
+      margin-bottom: 10px;
+    }
+
+    .tooltip .stats {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 4px 15px;
+    }
+
+    .tooltip .stat-label { color: #888; }
+    .tooltip .stat-value { color: #333; font-weight: 600; }
+    .tooltip .stat-value.yes { color: #27ae60; }
+    .tooltip .stat-value.no { color: #e74c3c; }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+      background: #fff;
+      padding: 15px 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #555;
+      font-size: 0.85rem;
+    }
+
+    .legend-football {
+      width: 28px;
+      height: 17px;
+    }
+
+    /* Quadrant summary cards */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+      width: 900px;
+    }
+
+    .summary-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-top: 4px solid;
+    }
+
+    .summary-card.quirky { border-color: #9b59b6; }
+    .summary-card.bangers { border-color: #f39c12; }
+    .summary-card.deep { border-color: #3498db; }
+    .summary-card.traditional { border-color: #2ecc71; }
+
+    .summary-card .card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+
+    .summary-card .card-title {
+      font-family: 'Russo One', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+    }
+
+    .summary-card.quirky .card-title { color: #9b59b6; }
+    .summary-card.bangers .card-title { color: #f39c12; }
+    .summary-card.deep .card-title { color: #3498db; }
+    .summary-card.traditional .card-title { color: #2ecc71; }
+
+    .summary-card .card-count {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .summary-card .card-desc {
+      font-size: 0.65rem;
+      color: #888;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏈 STADIUM ROAR QUADRANT MAP 🏈</h1>
+  <p class="subtitle">Mapping Fight Songs by Trope Count vs. Chant Score</p>
+
+  <div class="field-container">
+    <!-- Field stripes -->
+    <div class="field-stripes"></div>
+
+    <!-- End zones -->
+    <div class="end-zone end-zone-left">FIGHT</div>
+    <div class="end-zone end-zone-right">SONGS</div>
+
+    <!-- Field border -->
+    <div class="field-border"></div>
+
+    <!-- Yard lines -->
+    <div class="yard-lines" id="yard-lines"></div>
+
+    <!-- Center dividing lines -->
+    <div class="center-line-h"></div>
+    <div class="center-line-v"></div>
+
+    <!-- Quadrant overlays -->
+    <div class="plot-area">
+      <div class="quadrant quadrant-top-left"></div>
+      <div class="quadrant quadrant-top-right"></div>
+      <div class="quadrant quadrant-bottom-left"></div>
+      <div class="quadrant quadrant-bottom-right"></div>
+    </div>
+
+    <!-- Quadrant labels -->
+    <div class="quadrant-label label-top-left">🎭 QUIRKY ANTHEMS</div>
+    <div class="quadrant-label label-top-right">🔥 STADIUM BANGERS</div>
+    <div class="quadrant-label label-bottom-left">💎 DEEP CUTS</div>
+    <div class="quadrant-label label-bottom-right">🎺 TRADITIONAL MARCHES</div>
+
+    <!-- Axis labels -->
+    <div class="axis-label x-axis-label">TROPE COUNT →</div>
+    <div class="axis-label y-axis-label">← CHANT SCORE →</div>
+
+    <!-- Data points container -->
+    <div class="plot-area" id="plot-area"></div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <svg class="legend-football" viewBox="0 0 50 30"><ellipse cx="25" cy="15" rx="23" ry="12" fill="#c8102e" stroke="#fff" stroke-width="1.5"/><path d="M25 5 L25 25" stroke="#fff" stroke-width="2"/><path d="M20 9 L30 9 M20 15 L30 15 M20 21 L30 21" stroke="#fff" stroke-width="1.5"/></svg>
+      ACC
+    </div>
+    <div class="legend-item">
+      <svg class="legend-football" viewBox="0 0 50 30"><ellipse cx="25" cy="15" rx="23" ry="12" fill="#cf0a2c" stroke="#fff" stroke-width="1.5"/><path d="M25 5 L25 25" stroke="#fff" stroke-width="2"/><path d="M20 9 L30 9 M20 15 L30 15 M20 21 L30 21" stroke="#fff" stroke-width="1.5"/></svg>
+      Big 12
+    </div>
+    <div class="legend-item">
+      <svg class="legend-football" viewBox="0 0 50 30"><ellipse cx="25" cy="15" rx="23" ry="12" fill="#0033a0" stroke="#fff" stroke-width="1.5"/><path d="M25 5 L25 25" stroke="#fff" stroke-width="2"/><path d="M20 9 L30 9 M20 15 L30 15 M20 21 L30 21" stroke="#fff" stroke-width="1.5"/></svg>
+      Big Ten
+    </div>
+    <div class="legend-item">
+      <svg class="legend-football" viewBox="0 0 50 30"><ellipse cx="25" cy="15" rx="23" ry="12" fill="#003831" stroke="#fff" stroke-width="1.5"/><path d="M25 5 L25 25" stroke="#fff" stroke-width="2"/><path d="M20 9 L30 9 M20 15 L30 15 M20 21 L30 21" stroke="#fff" stroke-width="1.5"/></svg>
+      Pac-12
+    </div>
+    <div class="legend-item">
+      <svg class="legend-football" viewBox="0 0 50 30"><ellipse cx="25" cy="15" rx="23" ry="12" fill="#ff8200" stroke="#fff" stroke-width="1.5"/><path d="M25 5 L25 25" stroke="#fff" stroke-width="2"/><path d="M20 9 L30 9 M20 15 L30 15 M20 21 L30 21" stroke="#fff" stroke-width="1.5"/></svg>
+      SEC
+    </div>
+    <div class="legend-item">
+      <svg class="legend-football" viewBox="0 0 50 30"><ellipse cx="25" cy="15" rx="23" ry="12" fill="#666" stroke="#fff" stroke-width="1.5"/><path d="M25 5 L25 25" stroke="#fff" stroke-width="2"/><path d="M20 9 L30 9 M20 15 L30 15 M20 21 L30 21" stroke="#fff" stroke-width="1.5"/></svg>
+      Independent
+    </div>
+  </div>
+
+  <div class="summary-cards">
+    <div class="summary-card quirky">
+      <div class="card-icon">🎭</div>
+      <div class="card-title">QUIRKY ANTHEMS</div>
+      <div class="card-count" id="count-quirky">0</div>
+      <div class="card-desc">Low Tropes + High Chants</div>
+    </div>
+    <div class="summary-card bangers">
+      <div class="card-icon">🔥</div>
+      <div class="card-title">STADIUM BANGERS</div>
+      <div class="card-count" id="count-bangers">0</div>
+      <div class="card-desc">High Tropes + High Chants</div>
+    </div>
+    <div class="summary-card deep">
+      <div class="card-icon">💎</div>
+      <div class="card-title">DEEP CUTS</div>
+      <div class="card-count" id="count-deep">0</div>
+      <div class="card-desc">Low Tropes + Low Chants</div>
+    </div>
+    <div class="summary-card traditional">
+      <div class="card-icon">🎺</div>
+      <div class="card-title">TRADITIONAL MARCHES</div>
+      <div class="card-count" id="count-traditional">0</div>
+      <div class="card-desc">High Tropes + Low Chants</div>
+    </div>
+  </div>
+
+  <script>
+    // Data from Excel Sheet 1
+    const fightSongData = [
+      { school: "Boston College", song_name: "For Boston", conference: "ACC", trope_count: 0, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Clemson", song_name: "Tiger Rag", conference: "ACC", trope_count: 1, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Duke", song_name: "Fight Blue Devils", conference: "ACC", trope_count: 4, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Florida State", song_name: "FSU Fight Song", conference: "ACC", trope_count: 5, chant_score: 2, spelling: 1, nonsense: 1, rah: 0 },
+      { school: "Georgia Tech", song_name: "Ramblin' Wreck From Georgia Tech", conference: "ACC", trope_count: 3, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Louisville", song_name: "Fight! U of L", conference: "ACC", trope_count: 5, chant_score: 2, spelling: 1, nonsense: 0, rah: 1 },
+      { school: "Miami", song_name: "Miami U How-Dee-Doo", conference: "ACC", trope_count: 3, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "North Carolina", song_name: "I'm a Tar Heel Born", conference: "ACC", trope_count: 1, chant_score: 1, spelling: 0, nonsense: 0, rah: 1 },
+      { school: "NC State", song_name: "The Red & White Song", conference: "ACC", trope_count: 3, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Pittsburgh", song_name: "Hail to Pitt", conference: "ACC", trope_count: 6, chant_score: 2, spelling: 1, nonsense: 1, rah: 0 },
+      { school: "Syracuse", song_name: "Down the Field", conference: "ACC", trope_count: 6, chant_score: 1, spelling: 0, nonsense: 0, rah: 1 },
+      { school: "Virginia", song_name: "The Good Old Song", conference: "ACC", trope_count: 3, chant_score: 3, spelling: 1, nonsense: 1, rah: 1 },
+      { school: "Virginia Tech", song_name: "Tech Triumph", conference: "ACC", trope_count: 5, chant_score: 2, spelling: 1, nonsense: 1, rah: 0 },
+      { school: "Wake Forest", song_name: "O Here's To Wake Forest", conference: "ACC", trope_count: 3, chant_score: 1, spelling: 0, nonsense: 0, rah: 1 },
+      { school: "Baylor", song_name: "Old Fight", conference: "Big 12", trope_count: 5, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Iowa State", song_name: "Iowa State Fights", conference: "Big 12", trope_count: 4, chant_score: 2, spelling: 1, nonsense: 0, rah: 1 },
+      { school: "Kansas", song_name: "I'm a Jayhawk", conference: "Big 12", trope_count: 3, chant_score: 1, spelling: 0, nonsense: 1, rah: 0 },
+      { school: "Kansas State", song_name: "Wildcat Victory", conference: "Big 12", trope_count: 3, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Oklahoma", song_name: "Boomer Sooner", conference: "Big 12", trope_count: 2, chant_score: 2, spelling: 1, nonsense: 0, rah: 1 },
+      { school: "Oklahoma State", song_name: "Ride 'Em Cowboys", conference: "Big 12", trope_count: 4, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Texas", song_name: "Texas Fight", conference: "Big 12", trope_count: 4, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "TCU", song_name: "TCU Fight Song", conference: "Big 12", trope_count: 6, chant_score: 2, spelling: 1, nonsense: 0, rah: 1 },
+      { school: "Texas Tech", song_name: "Fight, Raiders, Fight", conference: "Big 12", trope_count: 3, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "West Virginia", song_name: "Hail West Virginia", conference: "Big 12", trope_count: 1, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Illinois", song_name: "Oskee-Wow-Wow", conference: "Big Ten", trope_count: 6, chant_score: 2, spelling: 0, nonsense: 1, rah: 1 },
+      { school: "Indiana", song_name: "Indiana, Our Indiana", conference: "Big Ten", trope_count: 3, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Iowa", song_name: "Iowa Fight Song", conference: "Big Ten", trope_count: 3, chant_score: 1, spelling: 0, nonsense: 0, rah: 1 },
+      { school: "Maryland", song_name: "Maryland Fight Song", conference: "Big Ten", trope_count: 3, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Michigan", song_name: "The Victors", conference: "Big Ten", trope_count: 0, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Michigan State", song_name: "Victory for MSU", conference: "Big Ten", trope_count: 5, chant_score: 2, spelling: 1, nonsense: 0, rah: 1 },
+      { school: "Minnesota", song_name: "The Minnesota Rouser", conference: "Big Ten", trope_count: 3, chant_score: 3, spelling: 1, nonsense: 1, rah: 1 },
+      { school: "Nebraska", song_name: "Dear Old Nebraska U.", conference: "Big Ten", trope_count: 1, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Northwestern", song_name: "Go! U Northwestern", conference: "Big Ten", trope_count: 4, chant_score: 1, spelling: 0, nonsense: 0, rah: 1 },
+      { school: "Ohio State", song_name: "Buckeye Battle Cry", conference: "Big Ten", trope_count: 5, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Penn State", song_name: "Fight On, State", conference: "Big Ten", trope_count: 5, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Purdue", song_name: "Hail Purdue", conference: "Big Ten", trope_count: 2, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Rutgers", song_name: "The Bells Must Ring", conference: "Big Ten", trope_count: 8, chant_score: 3, spelling: 1, nonsense: 1, rah: 1 },
+      { school: "Wisconsin", song_name: "On, Wisconsin", conference: "Big Ten", trope_count: 3, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Oregon", song_name: "Mighty Oregon", conference: "Big Ten", trope_count: 5, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "UCLA", song_name: "Sons of Westwood", conference: "Big Ten", trope_count: 5, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "USC", song_name: "Fight On, USC", conference: "Big Ten", trope_count: 5, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Washington", song_name: "Bow Down to Washington", conference: "Big Ten", trope_count: 4, chant_score: 1, spelling: 0, nonsense: 0, rah: 1 },
+      { school: "Notre Dame", song_name: "Victory March", conference: "Independent", trope_count: 6, chant_score: 1, spelling: 0, nonsense: 0, rah: 1 },
+      { school: "Arizona", song_name: "Bear Down, Arizona", conference: "Pac-12", trope_count: 1, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Arizona State", song_name: "Maroon and Gold", conference: "Pac-12", trope_count: 4, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "California", song_name: "Fight for California", conference: "Pac-12", trope_count: 5, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Colorado", song_name: "Fight CU", conference: "Pac-12", trope_count: 4, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Oregon State", song_name: "Hail to Old OSU", conference: "Pac-12", trope_count: 2, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Stanford", song_name: "Come Join the Band", conference: "Pac-12", trope_count: 3, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Utah", song_name: "Utah Man", conference: "Pac-12", trope_count: 4, chant_score: 1, spelling: 0, nonsense: 1, rah: 0 },
+      { school: "Washington State", song_name: "The Fight Song", conference: "Pac-12", trope_count: 5, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Alabama", song_name: "Yea Alabama", conference: "SEC", trope_count: 6, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Arkansas", song_name: "Arkansas Fight", conference: "SEC", trope_count: 3, chant_score: 2, spelling: 1, nonsense: 0, rah: 1 },
+      { school: "Auburn", song_name: "War Eagle", conference: "SEC", trope_count: 4, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Florida", song_name: "The Orange and Blue", conference: "SEC", trope_count: 2, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Georgia", song_name: "Glory, Glory", conference: "SEC", trope_count: 1, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Kentucky", song_name: "On! On! U of K", conference: "SEC", trope_count: 5, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "LSU", song_name: "Fight for LSU", conference: "SEC", trope_count: 5, chant_score: 2, spelling: 1, nonsense: 0, rah: 1 },
+      { school: "Ole Miss", song_name: "Forward Rebels", conference: "SEC", trope_count: 4, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Mississippi State", song_name: "Hail State", conference: "SEC", trope_count: 4, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Missouri", song_name: "Fight Tiger", conference: "SEC", trope_count: 3, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "South Carolina", song_name: "The Fighting Gamecocks Lead the Way", conference: "SEC", trope_count: 4, chant_score: 1, spelling: 1, nonsense: 0, rah: 0 },
+      { school: "Tennessee", song_name: "Rocky Top", conference: "SEC", trope_count: 0, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 },
+      { school: "Texas A&M", song_name: "Aggie War Hymn", conference: "SEC", trope_count: 4, chant_score: 1, spelling: 0, nonsense: 1, rah: 0 },
+      { school: "Vanderbilt", song_name: "Dynamite", conference: "SEC", trope_count: 3, chant_score: 0, spelling: 0, nonsense: 0, rah: 0 }
+    ];
+
+    const conferenceColors = {
+      "ACC": "#c8102e",
+      "Big 12": "#cf0a2c",
+      "Big Ten": "#0033a0",
+      "Pac-12": "#003831",
+      "SEC": "#ff8200",
+      "Independent": "#666666"
+    };
+
+    // Calculate quadrant thresholds (median split)
+    const tropeMedian = 4;
+    const chantMedian = 1;
+
+    function getQuadrant(trope, chant) {
+      if (trope < tropeMedian && chant > chantMedian) return { name: "🎭 Quirky Anthems", class: "quirky" };
+      if (trope >= tropeMedian && chant > chantMedian) return { name: "🔥 Stadium Bangers", class: "bangers" };
+      if (trope < tropeMedian && chant <= chantMedian) return { name: "💎 Deep Cuts", class: "deep" };
+      return { name: "🎺 Traditional Marches", class: "traditional" };
+    }
+
+    // Count quadrants
+    let counts = { quirky: 0, bangers: 0, deep: 0, traditional: 0 };
+
+    // Create yard lines
+    const yardLinesContainer = document.getElementById('yard-lines');
+    for (let i = 1; i <= 9; i++) {
+      const line = document.createElement('div');
+      line.className = 'yard-line';
+      line.style.left = `${(i / 10) * 100}%`;
+      yardLinesContainer.appendChild(line);
+
+      // Yard numbers
+      const num = i <= 5 ? i * 10 : (10 - i) * 10;
+      const numTop = document.createElement('div');
+      numTop.className = 'yard-number';
+      numTop.style.left = `${(i / 10) * 100}%`;
+      numTop.textContent = num;
+      yardLinesContainer.appendChild(numTop);
+
+      const numBottom = document.createElement('div');
+      numBottom.className = 'yard-number yard-number-bottom';
+      numBottom.style.left = `${(i / 10) * 100}%`;
+      numBottom.textContent = num;
+      yardLinesContainer.appendChild(numBottom);
+    }
+
+    // Create SVG football
+    function createFootball(color, size) {
+      return `
+        <svg width="${size}" height="${size * 0.6}" viewBox="0 0 50 30">
+          <defs>
+            <linearGradient id="fb-${color.replace('#', '')}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:${adjustColor(color, 30)}"/>
+              <stop offset="50%" style="stop-color:${color}"/>
+              <stop offset="100%" style="stop-color:${adjustColor(color, -30)}"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="25" cy="15" rx="22" ry="12" fill="url(#fb-${color.replace('#', '')})" stroke="#fff" stroke-width="2"/>
+          <path d="M25 5 L25 25" stroke="#fff" stroke-width="2.5"/>
+          <path d="M19 8 L31 8 M19 15 L31 15 M19 22 L31 22" stroke="#fff" stroke-width="1.5"/>
+        </svg>
+      `;
+    }
+
+    function adjustColor(color, amount) {
+      const hex = color.replace('#', '');
+      const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
+      const g = Math.max(0, Math.min(255, parseInt(hex.substr(2, 2), 16) + amount));
+      const b = Math.max(0, Math.min(255, parseInt(hex.substr(4, 2), 16) + amount));
+      return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    }
+
+    const plotArea = document.getElementById('plot-area');
+    const tooltip = document.getElementById('tooltip');
+
+    const maxTrope = 8;
+    const maxChant = 3;
+
+    // Track positions for jitter
+    const positionMap = {};
+
+    fightSongData.forEach(song => {
+      const quadrant = getQuadrant(song.trope_count, song.chant_score);
+      counts[quadrant.class]++;
+
+      // Calculate position
+      const xPercent = (song.trope_count / maxTrope) * 100;
+      const yPercent = (1 - song.chant_score / maxChant) * 100;
+
+      // Jitter for overlapping points
+      const posKey = `${song.trope_count}-${song.chant_score}`;
+      if (!positionMap[posKey]) positionMap[posKey] = 0;
+      const jitterIndex = positionMap[posKey];
+      const jitterX = ((jitterIndex % 5) - 2) * 2.5;
+      const jitterY = (Math.floor(jitterIndex / 5) - 1) * 4;
+      positionMap[posKey]++;
+
+      const point = document.createElement('div');
+      point.className = 'data-point';
+      point.style.left = `${Math.max(3, Math.min(97, xPercent + jitterX))}%`;
+      point.style.top = `${Math.max(3, Math.min(97, yPercent + jitterY))}%`;
+
+      const size = 28 + (song.trope_count / maxTrope) * 15;
+      const color = conferenceColors[song.conference] || '#666';
+
+      point.innerHTML = `
+        <div class="football-wrapper">
+          <div class="football-glow"></div>
+          ${createFootball(color, size)}
+        </div>
+      `;
+
+      // Tooltip events
+      point.addEventListener('mouseenter', (e) => {
+        tooltip.innerHTML = `
+          <div class="school">${song.school}</div>
+          <div class="song-name">"${song.song_name}"</div>
+          <div class="quadrant-name">${quadrant.name} • ${song.conference}</div>
+          <div class="stats">
+            <span class="stat-label">Trope Count:</span><span class="stat-value">${song.trope_count}</span>
+            <span class="stat-label">Chant Score:</span><span class="stat-value">${song.chant_score}</span>
+            <span class="stat-label">Spelling:</span><span class="stat-value ${song.spelling ? 'yes' : 'no'}">${song.spelling ? '✓' : '✗'}</span>
+            <span class="stat-label">Nonsense:</span><span class="stat-value ${song.nonsense ? 'yes' : 'no'}">${song.nonsense ? '✓' : '✗'}</span>
+            <span class="stat-label">Rah:</span><span class="stat-value ${song.rah ? 'yes' : 'no'}">${song.rah ? '✓' : '✗'}</span>
+          </div>
+        `;
+        tooltip.style.left = `${e.clientX + 15}px`;
+        tooltip.style.top = `${e.clientY - 10}px`;
+        tooltip.classList.add('visible');
+      });
+
+      point.addEventListener('mousemove', (e) => {
+        tooltip.style.left = `${e.clientX + 15}px`;
+        tooltip.style.top = `${e.clientY - 10}px`;
+      });
+
+      point.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('visible');
+      });
+
+      plotArea.appendChild(point);
+    });
+
+    // Update summary counts
+    document.getElementById('count-quirky').textContent = counts.quirky;
+    document.getElementById('count-bangers').textContent = counts.bangers;
+    document.getElementById('count-deep').textContent = counts.deep;
+    document.getElementById('count-traditional').textContent = counts.traditional;
+  </script>
+</body>
+</html>
